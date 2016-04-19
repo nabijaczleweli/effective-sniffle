@@ -1,0 +1,19 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "mxDgWk1mMGGiPLeetIxfjUhMy0z7wtEANag4eMvIUhpJXzfMw6HlN1xkfm31SD6pjA3z8zygkge+fsivflXG9QVDdRylyUaqsQwmUD5fy6aXTr2n7wxxGGfsamDNzhpqwa8YvoHxrlVQsc3GE6Yd0yCh4J6ZnQyTh1lViuU+I12SrDU1Ln64tYgkV+TBy6bi/FQg4pdnOrpXvaSyXy3RyhWNXnnBu2IyinhybV6N50ndS6KUYYGf9Df/blZwkE/7xH7YwVnru171mXsKWYkCRA7zepNwkhBhsCnyLQewEts/D0i75exd/FCiShi/0gQ9zPFxPHAHlw+8tuEdO6Gs+Ac06MTeyEqlGXFdfzB8RDSUQXXnwy9LE2pSG/DwmkTFEBHvuUZ5GI6kLVlY5AjGzGL7TVZFDIu/zNS76BuJ5JXZ95L0F8RYmSbCP0fCFwMPD85j+sOdiClSUgdXvVEzbiyj7jzcKqCiSmQGXTd3QLZcmmVowY1fVt6ME+i/SXvmnyZvXgxZr6kclExceD+vQIIrKDM6pzczQyi2eNIzv0HunmfIW7+gc0k6fJLKQOgCjdEKQvt2HXzweyV5ZBPcf0j7kZeOhWFLHh3AXcNG4OmWeofyCdH5GirLEVa9RLE6MKAl5QTZFUiQ7Zq83uBGd+2+ZgGJD70qJJLmhLffgOo="
+  file: target/release/effective-sniffle
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: $TRAVIS_RUST_VERSION = stable
+
+before_deploy:
+  - cargo build --release
+  - strip --strip-all --remove-section=.comment --remove-section=.note target/release/effective-sniffle
