@@ -7,3 +7,7 @@ keywords = ["language", "compiler"]
 license = "MIT"
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
+
+[dependencies]
+nom = "1.2"
+clap = "2.3"

@@ -24,11 +24,6 @@
 			"file_include_patterns": ["Cargo.*"],
 			"folder_exclude_patterns": ["*"]
 		},
-		{
-			"follow_symlinks": true,
-			"name": "Examples",
-			"path": "example"
-		},
 	],
 	"settings":
 	{
