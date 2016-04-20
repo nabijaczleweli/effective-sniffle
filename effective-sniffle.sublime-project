@@ -24,9 +24,5 @@
 			"file_include_patterns": ["Cargo.*"],
 			"folder_exclude_patterns": ["*"]
 		},
-	],
-	"settings":
-	{
-		"tab_size": 2
-	}
+	]
 }
