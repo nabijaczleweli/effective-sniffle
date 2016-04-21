@@ -16,5 +16,5 @@ fn main() {
 
 	let mut buf = Vec::new();
 	File::open(opts.input).unwrap().read_to_end(&mut buf).unwrap();
-	println!("{:?}", par::parse(&buf[..]));
+	println!("{:?}", par::parse(&buf[..]).unwrap());
 }

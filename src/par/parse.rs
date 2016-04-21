@@ -1,4 +1,3 @@
-use peggler::ParseResult;
 use self::super::{ASTNode, Primitive};
 use std::str;
 
@@ -28,6 +27,11 @@ rule!(digit:char =
         d: (["0"] / ["1"] / ["2"] / ["3"] / ["4"] / ["5"] / ["6"] / ["7"] / ["8"] / ["9"])
         => { d.chars().next().unwrap() });
 
-pub fn parse(bytes: &[u8]) -> ParseResult<Vec<ASTNode>> {
-    program(str::from_utf8(bytes).unwrap())
+pub fn parse(bytes: &[u8]) -> Result<Vec<ASTNode>, String> {
+    let source = str::from_utf8(bytes).unwrap();
+    match program(source) {
+        Ok((nodes, "")) => Ok(nodes),
+        Ok((_, unparsed)) => Err(format!("Parsing failed, no rules expected {:?}", &unparsed[0..unparsed.find("\n").unwrap_or(unparsed.len())])),
+        Err(_) => Err("General parse error".to_string()),
+    }
 }
