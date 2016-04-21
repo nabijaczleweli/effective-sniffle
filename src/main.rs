@@ -1,5 +1,6 @@
 extern crate clap;
-extern crate parse;
+#[macro_use]
+extern crate peggler;
 
 mod options;
 pub mod par;

@@ -1,18 +1,33 @@
+use peggler::ParseResult;
 use self::super::{ASTNode, Primitive};
-use parse;
+use std::str;
 
-pub fn parse(bytes: &[u8]) -> parse::Result<Vec<ASTNode>> {
-    let bytes = &mut &bytes[..];
 
-    let mut nodes = Vec::new();
-    loop {
-        parse::whitespace_if_any(bytes);
-        if bytes.len() == 0 {
-            break;
-        }
-        let val = try!(parse::i32(bytes));
-        let _ = try!(parse::literal(bytes, ";"));
-        nodes.push(ASTNode::Value(Primitive::Number(val as f32)));
-    }
-    Ok(nodes)
+rule!(program:Vec<ASTNode> =
+        lines: single_line*
+        whitespace
+        => { lines.into_iter().collect() });
+
+rule!(single_line:ASTNode =
+        whitespace
+        value: (digit*)
+        [";"]
+        => {
+            let value: String = value.into_iter().collect();
+            match &value[..] {
+                "" => ASTNode::Value(Primitive::Null),
+                value => ASTNode::Value(Primitive::Number(str::parse(value).unwrap())),
+            }
+        });
+
+rule!(whitespace:() =
+        ([" "] / ["\t"] / ["\r"]/ ["\n"])*
+        => { () });
+
+rule!(digit:char =
+        d: (["0"] / ["1"] / ["2"] / ["3"] / ["4"] / ["5"] / ["6"] / ["7"] / ["8"] / ["9"])
+        => { d.chars().next().unwrap() });
+
+pub fn parse(bytes: &[u8]) -> ParseResult<Vec<ASTNode>> {
+    program(str::from_utf8(bytes).unwrap())
 }

@@ -10,4 +10,4 @@ authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 
 [dependencies]
 clap = "2.3"
-parse = "0.1"
+peggler = "0.1"

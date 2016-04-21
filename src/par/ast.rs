@@ -6,6 +6,7 @@ pub enum ASTNode {
 
 #[derive(Debug, Clone)]
 pub enum Primitive {
-	Number(f32),
+	Number(u64),
 	String(String),
+	Null,
 }
