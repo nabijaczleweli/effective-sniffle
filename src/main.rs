@@ -8,7 +8,7 @@ pub mod par;
 pub use options::Options;
 
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read, Write};
 
 fn main() {
 	let opts = Options::parse();
@@ -16,5 +16,11 @@ fn main() {
 
 	let mut buf = Vec::new();
 	File::open(opts.input).unwrap().read_to_end(&mut buf).unwrap();
-	println!("{:?}", par::parse(&buf[..]).unwrap());
+	match par::parse(&buf[..]) {
+        Ok(tree) => println!("{:?}", tree),
+		Err(error) => {
+            let _ = io::stderr().write(error.as_bytes());
+            return;
+        }
+	}
 }
