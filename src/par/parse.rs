@@ -1,6 +1,6 @@
+use peggler::{ParseResult, ParseError};
 use self::super::{ASTNode, Primitive};
 use std::str;
-
 
 rule!(program:Vec<ASTNode> =
         lines: single_line*
@@ -9,13 +9,31 @@ rule!(program:Vec<ASTNode> =
 
 rule!(single_line:ASTNode =
         whitespace
-        value: (digit*)
+        value: expr
         [";"]
+        => { value });
+
+rule!(expr:ASTNode =
+        value: val
+        => { ASTNode::Value(value) });
+
+rule!(val:Primitive =
+        value: (string / number)
+        => { value });
+
+rule!(string:Primitive =
+        ["\""]
+        s: alnum*
+        ["\""]
+        => { Primitive::String(s.into_iter().collect()) });
+
+rule!(number:Primitive =
+        num: digit*
         => {
-            let value: String = value.into_iter().collect();
-            match &value[..] {
-                "" => ASTNode::Value(Primitive::Null),
-                value => ASTNode::Value(Primitive::Number(str::parse(value).unwrap())),
+            let num: String = num.into_iter().collect();
+            match &num[..] {
+                "" => Primitive::Null,
+                num => Primitive::Number(str::parse(num).unwrap()),
             }
         });
 
@@ -26,6 +44,21 @@ rule!(whitespace:() =
 rule!(digit:char =
         d: (["0"] / ["1"] / ["2"] / ["3"] / ["4"] / ["5"] / ["6"] / ["7"] / ["8"] / ["9"])
         => { d.chars().next().unwrap() });
+
+fn alnum(input: &str) -> ParseResult<char> {
+    let mut char_indices = input.char_indices();
+    match char_indices.next() {
+        Some((_, c)) => match char_indices.next() {
+            Some((index, _)) =>
+                match c {
+                    '"' => Err(ParseError),
+                    _ => Ok((c, &input[index..])),
+                },
+            None => Ok((c, &""[..])),
+        },
+        None => Err(ParseError),
+    }
+}
 
 pub fn parse(bytes: &[u8]) -> Result<Vec<ASTNode>, String> {
     let source = str::from_utf8(bytes).unwrap();
