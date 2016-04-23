@@ -1,6 +1,6 @@
 use peggler::{ParseResult, ParseError};
-use self::super::{ASTNode, Primitive};
-use std::str;
+use self::super::{ASTNode, Primitive, Expr, Op};
+use std::str::{self, FromStr};
 
 rule!(program:Vec<ASTNode> =
         lines: single_line*
@@ -9,11 +9,47 @@ rule!(program:Vec<ASTNode> =
 
 rule!(single_line:ASTNode =
         whitespace
-        value: expr
+        value: line
         [";"]
         => { value });
 
-rule!(expr:ASTNode =
+rule!(line:ASTNode =
+        value: (expression / astvalue / null)
+        => { value });
+
+rule!(expression:ASTNode =
+        value: anyexpr
+        => { ASTNode::Expression(value) });
+
+rule!(anyexpr:Expr =
+        value: (biexpr / valexpr)
+        => { value });
+
+rule!(valexpr:Expr =
+        value: val
+        => { Expr::Simple(value) });
+
+rule!(biexpr:Expr =
+        lhs: anyexpr
+        op: operator
+        rhs: anyexpr
+        => {
+            Expr::Bi {
+                lhs: Box::new(lhs),
+                op: op,
+                rhs: Box::new(rhs),
+            }
+        });
+
+rule!(operator:Op =
+        value: (["+"] / ["-"] / ["*"] / ["/"] / ["|"] / ["&"])
+        => { Op::from_str(value).unwrap() });
+
+rule!(null:ASTNode =
+        [""]
+        => { ASTNode::Null });
+
+rule!(astvalue:ASTNode =
         value: val
         => { ASTNode::Value(value) });
 
@@ -28,13 +64,10 @@ rule!(string:Primitive =
         => { Primitive::String(s.into_iter().collect()) });
 
 rule!(number:Primitive =
-        num: digit*
+        num: digit+
         => {
             let num: String = num.into_iter().collect();
-            match &num[..] {
-                "" => Primitive::Null,
-                num => Primitive::Number(str::parse(num).unwrap()),
-            }
+            Primitive::Number(str::parse(&num[..]).unwrap())
         });
 
 rule!(whitespace:() =
