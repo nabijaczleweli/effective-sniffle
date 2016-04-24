@@ -1,5 +1,5 @@
 mod ast;
-mod parse_grammar;
+mod parse;
 
 pub use self::ast::*;
-pub use self::parse_grammar::parse_Program as parse;
+pub use self::parse::program as parse;

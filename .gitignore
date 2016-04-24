@@ -10,5 +10,3 @@
 !src/**
 !test
 !test/**
-
-src/**/*_grammar.rs
