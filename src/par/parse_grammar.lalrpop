@@ -1,0 +1,51 @@
+use super::{ASTNode, Primitive, Expr, Op};
+use std::str::FromStr;
+
+grammar;
+
+pub Program: Vec<ASTNode> = {
+    <lines:SingleLine*> Whitespace => lines,
+};
+
+SingleLine: ASTNode = {
+    Whitespace <line:Line> ";" => line,
+};
+
+Line: ASTNode = {
+    <value:AnyExpr> => ASTNode::Expression(value),
+    <value:Val> => ASTNode::Value(value),
+    "" => ASTNode::Null,
+};
+
+AnyExpr: Expr = {
+    <value:BiExpr> => value,
+    <value:ValExpr> => value,
+};
+
+ValExpr: Expr =
+    <value:Val> => Expr::Simple(value);
+
+BiExpr: Expr =
+    <lhs:AnyExpr> <op:Operator> <rhs:AnyExpr> =>
+        Expr::Bi {
+            lhs: Box::new(lhs),
+            op: op,
+            rhs: Box::new(rhs),
+        };
+
+Operator: Op =
+    <value:r"[*+/|&-]"> => Op::from_str(value).unwrap();
+
+Val: Primitive = {
+    <value:String> => value,
+    <value:Number> => value,
+};
+
+String: Primitive =
+    "\"" <s:r"[A-Za-z_]*"> "\"" => Primitive::String(s.to_string());
+
+Number: Primitive =
+    <n:r"[0123456789]+"> => Primitive::Number(str::parse(n).unwrap());
+
+Whitespace: () =
+	r"[ \t\r\n]*" => ();

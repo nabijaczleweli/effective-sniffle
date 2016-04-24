@@ -1,6 +1,7 @@
 *
 !.gitignore
 !.travis.yml
+!build.rs
 !LICENSE
 !README.md
 !Cargo.toml
@@ -9,3 +10,5 @@
 !src/**
 !test
 !test/**
+
+src/**/*_grammar.rs

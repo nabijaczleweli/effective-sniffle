@@ -7,7 +7,11 @@ keywords = ["language", "compiler"]
 license = "MIT"
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
+build = "build.rs"
+
+[build-dependencies]
+lalrpop = "0.11.0"
 
 [dependencies]
 clap = "2.3"
-peggler = "0.1"
+lalrpop-util = "0.11.0"
